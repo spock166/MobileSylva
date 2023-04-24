@@ -1,0 +1,4 @@
+include MobileSylva/schema.sql
+graft MobileSylva/static
+graft MobileSylva/templates
+global-exclude *.pyc

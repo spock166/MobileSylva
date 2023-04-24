@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Queries{% endblock %}</h1>
+  {% if g.user %}
+    <a class="action" href="{{ url_for('query.create') }}">Ask Sylva</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  {% for query in queries %}
+    <article class="query">
+      <header>
+        <div>
+          <h1>By {{ query['username'] }} on {{ query['created'].strftime('%m/%d/%Y, %H:%M:%S') }}</h1>
+        </div>
+      </header>
+      <p class="body">
+        {{ query['content'] }}
+        {% if query['answered'] %}
+          Answer: {{query['answer']}}
+        {% else %}
+          Answer: Still in the queue
+        {% endif %}
+      </p>
+    </article>
+    {% if not loop.last %}
+      <hr>
+    {% endif %}
+  {% endfor %}
+{% endblock %}
