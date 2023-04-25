@@ -1,5 +1,3 @@
-
-import time
 import os, sys
 from sylvaBrain import *
 import sqlite3
@@ -24,7 +22,7 @@ class SylvaGUI:
         self.avatar_label.pack(side='top')
 
         self.status = tk.StringVar()
-        self.info = tk.Label(self.root, bg=self.textbox_color, height=20,width=65,textvariable=self.status,justify="left", anchor="nw",wraplength=500)
+        self.info = tk.Label(self.root, bg=self.textbox_color, height=20,width=65,textvariable=self.status,justify="left", anchor="nw",wraplength=450)
         self.info.pack(side='top')
 
     def run(self):
@@ -48,11 +46,13 @@ class SylvaGUI:
             sqliteConnection = sqlite3.connect(os.path.join(sys.path[0],'instance','sylva.sqlite'))
             cursor = sqliteConnection.cursor()
 
-            res = cursor.execute('SELECT id, content FROM query WHERE answered=0 ORDER BY created')
+            res = cursor.execute('SELECT id, content, author_id FROM query WHERE answered=0 ORDER BY created')
             fetch = res.fetchone()
 
             if(fetch):
-                [ans,sentiment] = self.processFetch(fetch)
+                res = cursor.execute('select username FROM user WHERE id=?',(fetch[2],))
+                username = res.fetchone()
+                [ans,sentiment] = self.processFetch(fetch,username[0])
                 
                 update = "UPDATE query SET answered=1, answer=? WHERE id=?"
                 res=cursor.execute(update,(ans,str(fetch[0]),))
@@ -64,9 +64,8 @@ class SylvaGUI:
             if sqliteConnection:
                 sqliteConnection.close()
 
-    def processFetch(self,fetch):
-        print(fetch[1])
-        ans = Sylva().respond(fetch[1])
+    def processFetch(self,fetch,username):
+        ans = Sylva().respond(username,fetch[1])
         sentiment = Sylva().sentimentAnalysis(ans)
         self.updateSentiment(sentiment)
         self.updateStatus(ans)

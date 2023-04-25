@@ -27,8 +27,9 @@ class Sylva:
     def __init__(self, model_engine="gpt-3.5-turbo"):
         self.model_engine = model_engine
 
-    def respond(self, message):
-        prompt = f"User: {message}\nSylva the vtuber:"
+    def respond(self, author, message):
+        prompt = f"{author}: {message}\nSylva the vtuber:"
+        print(prompt)
         response = openai.ChatCompletion.create(
             model=self.model_engine,
             messages=[
@@ -49,13 +50,13 @@ class Sylva:
             temperature=0.7,
         )
 
-        response=completions.choices[random.randint(0,1)].text.strip()
+        response=completions.choices[0].text.strip()
 
         for sentiment in Sentiment:
             if(response.find(sentiment.name)!= -1):
                 return sentiment.name
         
-        return Sentiment.neutral.name
+        return random.choice([Sentiment.neutral.name,Sentiment.positive.name])
     
     def synthesize_text(self, message):
         """Synthesizes speech from the input string of text."""
